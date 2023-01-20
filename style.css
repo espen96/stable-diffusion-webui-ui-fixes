@@ -1,7 +1,26 @@
 .container {
     max-width: 100%;
-}
 
+
+	display:flex;
+	    background-color: #141f2a !important;
+}
+.gradio-container{
+		    background-color: #141f2a !important;
+}
+	
+	
+.dark .gr-panel{
+    background-color: #1f2937;	
+}
+.eta-bar{
+	
+border-radius: 1em;	
+	
+}	
+#txt2img_token_counter {
+    height: 0px;
+}
 .token-counter{
     position: absolute;
     display: inline-block;
@@ -15,15 +34,32 @@
     box-shadow: 0 0 0.0 0.3em rgba(255,0,0,0.15), inset 0 0 0.6em rgba(255,0,0,0.075);
     border: 2px solid rgba(255,0,0,0.4) !important;
 }
-
-.token-counter div{
-    display: inline;
+#txt2img_token_counter {
+    height: 0px;
 }
 
-.token-counter span{
-    padding: 0.1em 0.75em;
+#img2img_token_counter {
+    height: 0px;
+}
+#txt2img_gallery_container
+{
+	height:100%
+}
+#txt2img_gallery
+{
+	height:100%
 }
 
+#img2img_results
+{
+	height:100%
+}
+ #img2img_settings
+{
+	height:100%;
+    display: flex;
+    flex-direction: row-reverse;
+}
 #sh{
     min-width: 2em;
     min-height: 2em;
@@ -69,10 +105,13 @@
     #txt2img_gallery, #img2img_gallery {
         min-height: 768px;
     }
+
+	
 }
 
 #txt2img_gallery img, #img2img_gallery img{
-    object-fit: scale-down;
+    object-fit: contain;
+    max-height: 100%;
 }
 
 .justify-center.overflow-x-scroll {
@@ -127,7 +166,7 @@
 #roll_col{
     min-width: unset !important;
     flex-grow: 0 !important;
-    padding: 0 1em 0 0;
+    padding: 0.4em 0;
     gap: 0;
 }
 
@@ -145,7 +184,6 @@
 #interrogate_col{
     min-width: 0 !important;
     max-width: 8em !important;
-    margin-right: 1em;
 }
 #interrogate, #deepbooru{
     margin: 0em 0.25em 0.9em 0.25em;
@@ -173,6 +211,16 @@
 .my-4{
     margin-top: 0;
     margin-bottom: 0;
+}
+
+#toprow div.gr-box, #toprow div.gr-form{
+    border: none;
+    gap: 0;
+    background: transparent;
+    box-shadow: none;
+}
+#toprow div{
+    gap: 0;
 }
 
 #resize_mode{
@@ -210,7 +258,19 @@ button{
         position: absolute;
     }
 }
-
+@media screen and (max-width: 708px) {
+	#txt2img_results{
+    order: -1;
+	height: initial;
+}
+}
+@media screen and (max-width: 420px) {
+	#roll_col{
+    flex-direction: row !important;
+	flex-wrap:nowrap;
+	
+}
+}
 @media screen and (max-width: 767px) {
     #txt2img_preview, #img2img_preview, #ti_preview {
         position: relative;
@@ -222,12 +282,10 @@ button{
 }
 
 fieldset span.text-gray-500, .gr-block.gr-box span.text-gray-500,  label.block span{
-    position: absolute;
-    top: -0.7em;
-    line-height: 1.2em;
+
     padding: 0;
     margin: 0 0.5em;
-
+	width:fit-content;
     background-color: white;
     box-shadow:  6px 0 6px 0px white, -6px 0 6px 0px white;
 
@@ -560,16 +618,26 @@ canvas[key="mask"] {
 
 /* gradio 3.4.1 stuff for editable scrollbar values */
 .gr-box > div > div > input.gr-text-input{
-    position: absolute;
-    right: 0.5em;
-    top: -0.6em;
     z-index: 400;
-    width: 8em;
+    width: 4em;
+    padding: unset;
 }
 #quicksettings .gr-box > div > div > input.gr-text-input {
   top: -1.12em;
 }
+#img2img_settings_group {
+flex-shrink: 2;
 
+}
+canvas{
+width: 100%;
+
+}
+.touch-none{
+width: 100% !important;
+height:100% !important;
+
+}
 .row.gr-compact{
     overflow: visible;
 }
@@ -579,9 +647,10 @@ canvas[key="mask"] {
 #img2maskimg, #img2maskimg > .h-60, #img2maskimg > .h-60 > div, #img2maskimg > .h-60 > div > img,
 #inpaint_sketch, #inpaint_sketch > .h-60, #inpaint_sketch > .h-60 > div, #inpaint_sketch > .h-60 > div > img
 {
-    height: 480px !important;
-    max-height: 480px !important;
+    height: 100% !important;
+    max-height: 100% !important;
     min-height: 480px !important;
+    overflow: auto;
 }
 
 /* Extensions */
@@ -639,7 +708,7 @@ canvas[key="mask"] {
     max-width: 2.5em;
     min-width: 2.5em !important;
     height: 2.4em;
-    margin: 1.6em 0.7em 0.55em 0;
+    margin: 3.1em 0.7em 0.55em 0;
 }
 
 #tab_modelmerger .gr-button-tool{
@@ -697,7 +766,11 @@ footer {
 #txtimg_hr_finalres .resolution{
     font-weight: bold;
 }
+.gr-button-lg
+{
 
+
+}
 #txt2img_checkboxes, #img2img_checkboxes{
     margin-bottom: 0.5em;
 }
@@ -711,28 +784,38 @@ footer {
     opacity: 0.5;
 }
 
-[id*='_prompt_container']{
-    gap: 0;
-}
-
-[id*='_prompt_container'] > div{
-    margin: -0.4em 0 0 0;
-}
-
 .gr-compact {
     border: none;
 }
 
 .dark .gr-compact{
     background-color: rgb(31 41 55 / var(--tw-bg-opacity));
-    margin-left: 0.8em;
+
+}
+.tabitem {
+	height:	100%;	
 }
 
-.gr-compact{
-    overflow: visible;
+	
+div.tabitem > div:first-child {
+	height:	100%;	
+}
+div.tabs  > div:first-child {
+    overflow-y: clip;
+    overflow-x: overlay;
+    flex-wrap: nowrap;
+}
+.items-stretch {
+	height:	100%;	
+}
+.tabs {
+	height:	100%;
+	overflow:hidden;
+	
 }
 
 .gr-compact > *{
+    margin-top: 0.5em !important;
 }
 
 .gr-compact .gr-block, .gr-compact .gr-form{
