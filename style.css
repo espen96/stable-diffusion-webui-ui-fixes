@@ -56,9 +56,9 @@ border-radius: 1em;
 }
  #img2img_settings
 {
-	height:100%;
     display: flex;
     flex-direction: row-reverse;
+    flex-wrap: wrap;
 }
 #sh{
     min-width: 2em;
@@ -646,6 +646,7 @@ canvas[key="mask"] {
 }
 #img2img_settings_group {
 flex-shrink: 2;
+flex-wrap: wrap;
 
 }
 canvas{
