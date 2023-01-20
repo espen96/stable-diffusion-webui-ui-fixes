@@ -369,52 +369,51 @@ def create_toprow(is_img2img):
     id_part = "img2img" if is_img2img else "txt2img"
 
     with gr.Row(elem_id=f"{id_part}_toprow", variant="compact"):
-        with gr.Column(elem_id=f"{id_part}_prompt_container", scale=6):
+        with gr.Column(elem_id=f"{id_part}_prompt_container", scale=2):
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        prompt = gr.Textbox(label="Prompt", elem_id=f"{id_part}_prompt", show_label=False,
-                                            lines=2, placeholder="Prompt (press Ctrl+Enter or Alt+Enter to generate)")
+                        prompt = gr.Textbox(label="Prompt", elem_id=f"{id_part}_prompt", show_label=True,
+                                            lines=3, placeholder="Prompt (press Ctrl+Enter or Alt+Enter to generate)")
 
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
                         negative_prompt = gr.Textbox(
-                            label="Negative prompt", elem_id=f"{id_part}_neg_prompt", show_label=False, lines=2, placeholder="Negative prompt (press Ctrl+Enter or Alt+Enter to generate)")
+                            label="Negative prompt", elem_id=f"{id_part}_neg_prompt", show_label=True, lines=3, placeholder="Negative prompt (press Ctrl+Enter or Alt+Enter to generate)")
 
-        with gr.Column(scale=1, elem_id="roll_col"):
-            paste = gr.Button(value=paste_symbol, elem_id="paste")
-            save_style = gr.Button(
-                value=save_style_symbol, elem_id="style_create")
-            prompt_style_apply = gr.Button(
-                value=apply_style_symbol, elem_id="style_apply")
-            clear_prompt_button = gr.Button(
-                value=clear_prompt_symbol, elem_id=f"{id_part}_clear_prompt")
-            token_counter = gr.HTML(
-                value="<span></span>", elem_id=f"{id_part}_token_counter")
-            token_button = gr.Button(
-                visible=False, elem_id=f"{id_part}_token_button")
-            negative_token_counter = gr.HTML(
-                value="<span></span>", elem_id=f"{id_part}_negative_token_counter")
-            negative_token_button = gr.Button(
-                visible=False, elem_id=f"{id_part}_negative_token_button")
 
-            clear_prompt_button.click(
-                fn=lambda *x: x,
-                _js="confirm_clear_prompt",
-                inputs=[prompt, negative_prompt],
-                outputs=[prompt, negative_prompt],
-            )
 
-        button_interrogate = None
-        button_deepbooru = None
-        if is_img2img:
-            with gr.Column(scale=1, elem_id="interrogate_col"):
-                button_interrogate = gr.Button(
-                    'Interrogate\nCLIP', elem_id="interrogate")
-                button_deepbooru = gr.Button(
-                    'Interrogate\nDeepBooru', elem_id="deepbooru")
+        with gr.Row(elem_id="style_box"):
+            prompt_styles = gr.Dropdown(label="Styles",lines=2, elem_id=f"{id_part}_styles", choices=[
+                                        k for k, v in shared.prompt_styles.styles.items()], value=[], multiselect=True)
 
+            with gr.Column(scale=1, elem_id="roll_col"):
+                paste = gr.Button(value=paste_symbol, elem_id="paste")
+                save_style = gr.Button(
+                    value=save_style_symbol, elem_id="style_create")
+                prompt_style_apply = gr.Button(
+                    value=apply_style_symbol, elem_id="style_apply")
+                clear_prompt_button = gr.Button(
+                    value=clear_prompt_symbol, elem_id=f"{id_part}_clear_prompt")
+                token_counter = gr.HTML(
+                    value="<span></span>", elem_id=f"{id_part}_token_counter")
+                token_button = gr.Button(
+                    visible=False, elem_id=f"{id_part}_token_button")
+                negative_token_counter = gr.HTML(
+                    value="<span></span>", elem_id=f"{id_part}_negative_token_counter")
+                negative_token_button = gr.Button(
+                    visible=False, elem_id=f"{id_part}_negative_token_button")
+
+                clear_prompt_button.click(
+                    fn=lambda *x: x,
+                    _js="confirm_clear_prompt",
+                    inputs=[prompt, negative_prompt],
+                    outputs=[prompt, negative_prompt],
+                )
+                create_refresh_button(prompt_styles, shared.prompt_styles.reload, lambda: {"choices": [
+                        k for k, v in shared.prompt_styles.styles.items()]}, f"refresh_{id_part}_styles")
+                              
         with gr.Column(scale=1):
             with gr.Row(elem_id=f"{id_part}_generate_box"):
                 interrupt = gr.Button(
@@ -434,12 +433,16 @@ def create_toprow(is_img2img):
                     inputs=[],
                     outputs=[],
                 )
+                button_interrogate = None
+                button_deepbooru = None
+                if is_img2img:
+                    with gr.Column(scale=1, elem_id="interrogate_col"):
+                        button_interrogate = gr.Button(
+                            'CLIP', elem_id="interrogate")
+                        button_deepbooru = gr.Button(
+                            'DeepBooru', elem_id="deepbooru")      
 
-            with gr.Row():
-                prompt_styles = gr.Dropdown(label="Styles", elem_id=f"{id_part}_styles", choices=[
-                                            k for k, v in shared.prompt_styles.styles.items()], value=[], multiselect=True)
-                create_refresh_button(prompt_styles, shared.prompt_styles.reload, lambda: {"choices": [
-                                      k for k, v in shared.prompt_styles.styles.items()]}, f"refresh_{id_part}_styles")
+
 
     return prompt, prompt_styles, negative_prompt, submit, button_interrogate, button_deepbooru, prompt_style_apply, save_style, paste, token_counter, token_button, negative_token_counter, negative_token_button
 
@@ -892,7 +895,7 @@ def create_ui():
             label="", elem_id="img2img_prompt_image", file_count="single", type="binary", visible=False)
 
         with FormRow().style(equal_height=True):
-            with gr.Column(variant='compact', elem_id="img2img_settings",scale=2):
+            with gr.Column(variant='compact', elem_id="img2img_settings", scale=2):
                 copy_image_buttons = []
                 copy_image_destinations = {}
 
@@ -978,10 +981,9 @@ def create_ui():
                         outputs=[],
                     )
                 with gr.Column(variant='compact', elem_id="img2img_settings_group"):
-
                     with FormRow():
                         resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", choices=[
-                                            "Just resize", "Crop and resize", "Resize and fill", "Just resize (latent upscale)"], type="index", value="Just resize")
+                            "Just resize", "Crop and resize", "Resize and fill", "Just resize (latent upscale)"], type="index", value="Just resize")
 
                     for category in ordered_ui_categories():
                         if category == "sampler":
@@ -1043,11 +1045,11 @@ def create_ui():
 
                                 with FormRow():
                                     inpainting_mask_invert = gr.Radio(label='Mask mode', choices=[
-                                                                    'Inpaint masked', 'Inpaint not masked'], value='Inpaint masked', type="index", elem_id="img2img_mask_mode")
+                                        'Inpaint masked', 'Inpaint not masked'], value='Inpaint masked', type="index", elem_id="img2img_mask_mode")
 
                                 with FormRow():
                                     inpainting_fill = gr.Radio(label='Masked content', choices=[
-                                                            'fill', 'original', 'latent noise', 'latent nothing'], value='original', type="index", elem_id="img2img_inpainting_fill")
+                                        'fill', 'original', 'latent noise', 'latent nothing'], value='original', type="index", elem_id="img2img_inpainting_fill")
 
                                 with FormRow():
                                     with gr.Column():
@@ -1063,7 +1065,8 @@ def create_ui():
 
                                 for i, elem in enumerate([tab_img2img, tab_sketch, tab_inpaint, tab_inpaint_color, tab_inpaint_upload, tab_batch]):
                                     elem.select(
-                                        fn=lambda tab=i: select_img2img_tab(tab),
+                                        fn=lambda tab=i: select_img2img_tab(
+                                            tab),
                                         inputs=[],
                                         outputs=[inpaint_controls, mask_alpha],
                                     )
@@ -2008,7 +2011,8 @@ def create_ui():
         with gr.Accordion("Open for quicksettings"):
             with gr.Row(elem_id="quicksettings", variant="compact"):
                 for i, k, item in sorted(quicksettings_list, key=lambda x: quicksettings_names.get(x[1], x[0])):
-                    component = create_setting_component(k, is_quicksettings=True)
+                    component = create_setting_component(
+                        k, is_quicksettings=True)
                     component_dict[k] = component
 
         parameters_copypaste.integrate_settings_paste_fields(component_dict)

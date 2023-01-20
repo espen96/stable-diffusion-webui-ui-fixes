@@ -165,9 +165,10 @@ border-radius: 1em;
 
 #roll_col{
     min-width: unset !important;
-    flex-grow: 0 !important;
+
     padding: 0.4em 0;
     gap: 0;
+    margin-top: -26px;
 }
 
 #roll_col > button {
@@ -180,8 +181,25 @@ border-radius: 1em;
     padding-right: 0.25em;
     margin: 0.1em 0;
 }
+#img2img_prompt_container
+{
+flex-direction: row;
+
+}
+#txt2img_prompt_container
+{
+flex-direction: row;
+
+}
+
+#style_box{
+flex-direction: column;
+
+}
 
 #interrogate_col{
+    flex-direction: row;
+    gap: 0;
     min-width: 0 !important;
     max-width: 8em !important;
 }
@@ -196,7 +214,7 @@ border-radius: 1em;
 }
 
 #txt2img_styles, #img2img_styles{
-    margin-top: 1em;
+    margin-top: 0em;
 }
 
 #txt2img_styles ul, #img2img_styles ul{
@@ -264,13 +282,13 @@ button{
 	height: initial;
 }
 }
-@media screen and (max-width: 420px) {
 	#roll_col{
     flex-direction: row !important;
 	flex-wrap:nowrap;
+    justify-content: space-evenly;
 	
 }
-}
+
 @media screen and (max-width: 767px) {
     #txt2img_preview, #img2img_preview, #ti_preview {
         position: relative;
@@ -535,6 +553,7 @@ input[type="range"]{
 
 #txt2img_generate_box, #img2img_generate_box{
     position: relative;
+    flex-direction: column;
 }
 
 #txt2img_interrupt, #img2img_interrupt, #txt2img_skip, #img2img_skip{
@@ -691,7 +710,6 @@ height:100% !important;
 }
 
 #image_buttons_txt2img button, #image_buttons_img2img button, #image_buttons_extras button{
-    min-width: auto;
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
@@ -768,14 +786,14 @@ footer {
 }
 .gr-button-lg
 {
-
+height: 32px;
 
 }
 #txt2img_checkboxes, #img2img_checkboxes{
     margin-bottom: 0.5em;
 }
 #txt2img_checkboxes > div, #img2img_checkboxes > div{
-    flex: 0;
+    flex: 1;
     white-space: nowrap;
     min-width: auto;
 }
