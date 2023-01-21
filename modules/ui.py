@@ -20,7 +20,7 @@ import numpy as np
 from PIL import Image, PngImagePlugin
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
 
-from modules import sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae
+from modules import sd_hijack, sd_models, localization, script_callbacks, ui_extensions, deepbooru, sd_vae, extra_networks
 from modules.ui_components import FormRow, FormGroup, ToolButton, FormHTML
 from modules.paths import script_path
 
@@ -91,6 +91,7 @@ refresh_symbol = '\U0001f504'  # 🔄
 save_style_symbol = '\U0001f4be'  # 💾
 apply_style_symbol = '\U0001f4cb'  # 📋
 clear_prompt_symbol = '\U0001F5D1'  # 🗑️
+extra_networks_symbol = '\U0001F3B4'  # 🎴
 
 
 def plaintext_to_html(text):
@@ -238,17 +239,17 @@ def process_interrogate(interrogation_function, mode, ii_input_dir, ii_output_di
             print(interrogation_function(img), file=open(
                 os.path.join(ii_output_dir, left + ".txt"), 'a'))
 
-        return [gr_show(True), None]
+        return [gr.update(), None]
 
 
 def interrogate(image):
     prompt = shared.interrogator.interrogate(image.convert("RGB"))
-    return gr_show(True) if prompt is None else prompt
+    return gr.update() if prompt is None else prompt
 
 
 def interrogate_deepbooru(image):
     prompt = deepbooru.model.tag(image)
-    return gr_show(True) if prompt is None else prompt
+    return gr.update() if prompt is None else prompt
 
 
 def create_seed_inputs(target_interface):
@@ -348,10 +349,10 @@ def connect_reuse_seed(seed: gr.Number, reuse_seed: gr.Button, generation_info: 
 
 def update_token_counter(text, steps):
     try:
-        _, prompt_flat_list, _ = prompt_parser.get_multicond_prompt_list([
-                                                                         text])
-        prompt_schedules = prompt_parser.get_learned_conditioning_prompt_schedules(
-            prompt_flat_list, steps)
+        text, _ = extra_networks.parse_prompt(text)
+
+        _, prompt_flat_list, _ = prompt_parser.get_multicond_prompt_list([text])
+        prompt_schedules = prompt_parser.get_learned_conditioning_prompt_schedules(prompt_flat_list, steps)
 
     except Exception:
         # a parsing error can happen here during typing, and we don't want to bother the user with
@@ -444,7 +445,7 @@ def create_toprow(is_img2img):
 
 
 
-    return prompt, prompt_styles, negative_prompt, submit, button_interrogate, button_deepbooru, prompt_style_apply, save_style, paste, token_counter, token_button, negative_token_counter, negative_token_button
+    return prompt, prompt_styles, negative_prompt, submit, button_interrogate, button_deepbooru, prompt_style_apply, save_style, paste, extra_networks_button, token_counter, token_button, negative_token_counter, negative_token_button
 
 
 def setup_progressbar(*args, **kwargs):
@@ -675,12 +676,15 @@ def create_ui():
     modules.scripts.scripts_txt2img.initialize_scripts(is_img2img=False)
 
     with gr.Blocks(analytics_enabled=False) as txt2img_interface:
-        txt2img_prompt, txt2img_prompt_styles, txt2img_negative_prompt, submit, _, _, txt2img_prompt_style_apply, txt2img_save_style, txt2img_paste, token_counter, token_button, negative_token_counter, negative_token_button = create_toprow(
-            is_img2img=False)
+        txt2img_prompt, txt2img_prompt_styles, txt2img_negative_prompt, submit, _, _, txt2img_prompt_style_apply, txt2img_save_style, txt2img_paste, extra_networks_button, token_counter, token_button, negative_token_counter, negative_token_button = create_toprow(is_img2img=False)
 
         dummy_component = gr.Label(visible=False)
         txt_prompt_img = gr.File(label="", elem_id="txt2img_prompt_image",
                                  file_count="single", type="binary", visible=False)
+
+        with FormRow(variant='compact', elem_id="txt2img_extra_networks", visible=False) as extra_networks:
+            from modules import ui_extra_networks
+            extra_networks_ui = ui_extra_networks.create_ui(extra_networks, extra_networks_button, 'txt2img')
 
         with gr.Row().style(equal_height=True):
             with gr.Column(variant='compact', elem_id="txt2img_settings"):
@@ -884,18 +888,23 @@ def create_ui():
             negative_token_button.click(fn=wrap_queued_call(update_token_counter), inputs=[
                                         txt2img_negative_prompt, steps], outputs=[negative_token_counter])
 
+            ui_extra_networks.setup_ui(extra_networks_ui, txt2img_gallery)
+
     modules.scripts.scripts_current = modules.scripts.scripts_img2img
     modules.scripts.scripts_img2img.initialize_scripts(is_img2img=True)
 
     with gr.Blocks(analytics_enabled=False) as img2img_interface:
-        img2img_prompt, img2img_prompt_styles, img2img_negative_prompt, submit, img2img_interrogate, img2img_deepbooru, img2img_prompt_style_apply, img2img_save_style, img2img_paste, token_counter, token_button, negative_token_counter, negative_token_button = create_toprow(
-            is_img2img=True)
+        img2img_prompt, img2img_prompt_styles, img2img_negative_prompt, submit, img2img_interrogate, img2img_deepbooru, img2img_prompt_style_apply, img2img_save_style, img2img_paste, extra_networks_button, token_counter, token_button, negative_token_counter, negative_token_button = create_toprow(is_img2img=True)
 
         img2img_prompt_img = gr.File(
             label="", elem_id="img2img_prompt_image", file_count="single", type="binary", visible=False)
 
+        with FormRow(variant='compact', elem_id="img2img_extra_networks", visible=False) as extra_networks:
+            from modules import ui_extra_networks
+            extra_networks_ui_img2img = ui_extra_networks.create_ui(extra_networks, extra_networks_button, 'img2img')
+
         with FormRow().style(equal_height=True):
-            with gr.Column(variant='compact', elem_id="img2img_settings", scale=2):
+            with gr.Column(variant='compact', elem_id="img2img_settings"):
                 copy_image_buttons = []
                 copy_image_destinations = {}
 
@@ -1153,7 +1162,6 @@ def create_ui():
                     init_img_inpaint,
                 ],
                 outputs=[img2img_prompt, dummy_component],
-                show_progress=False,
             )
 
             img2img_prompt.submit(**img2img_args)
@@ -1165,8 +1173,7 @@ def create_ui():
             )
 
             img2img_deepbooru.click(
-                fn=lambda *args: process_interrogate(
-                    interrogate_deepbooru, *args),
+                fn=lambda *args: process_interrogate(interrogate_deepbooru, *args),
                 **interrogate_args,
             )
 
@@ -1197,6 +1204,8 @@ def create_ui():
                                img2img_prompt, steps], outputs=[token_counter])
             negative_token_button.click(fn=wrap_queued_call(update_token_counter), inputs=[
                                         txt2img_negative_prompt, steps], outputs=[negative_token_counter])
+
+            ui_extra_networks.setup_ui(extra_networks_ui_img2img, img2img_gallery)
 
             img2img_paste_fields = [
                 (img2img_prompt, "Prompt"),
@@ -1933,10 +1942,8 @@ def create_ui():
                 reload_script_bodies = gr.Button(
                     value='Reload custom script bodies (No ui updates, No restart)', variant='secondary', elem_id="settings_reload_script_bodies")
 
-            if os.path.exists("html/licenses.html"):
-                with open("html/licenses.html", encoding="utf8") as file:
-                    with gr.TabItem("Licenses"):
-                        gr.HTML(file.read(), elem_id="licenses")
+            with gr.TabItem("Licenses"):
+                gr.HTML(shared.html("licenses.html"), elem_id="licenses")
 
             gr.Button(value="Show all pages",
                       elem_id="settings_show_all_pages")
@@ -2027,11 +2034,9 @@ def create_ui():
             audio_notification = gr.Audio(interactive=False, value=os.path.join(
                 script_path, "notification.mp3"), elem_id="audio_notification", visible=False)
 
-        if os.path.exists("html/footer.html"):
-            with open("html/footer.html", encoding="utf8") as file:
-                footer = file.read()
-                footer = footer.format(versions=versions_html())
-                gr.HTML(footer, elem_id="footer")
+        footer = shared.html("footer.html")
+        footer = footer.format(versions=versions_html())
+        gr.HTML(footer, elem_id="footer")
 
         text_settings = gr.Textbox(
             elem_id="settings_json", value=lambda: opts.dumpjson(), visible=False)
