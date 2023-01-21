@@ -667,9 +667,8 @@ height:100% !important;
 #img2maskimg, #img2maskimg > .h-60, #img2maskimg > .h-60 > div, #img2maskimg > .h-60 > div > img,
 #inpaint_sketch, #inpaint_sketch > .h-60, #inpaint_sketch > .h-60 > div, #inpaint_sketch > .h-60 > div > img
 {
-    height: 100% !important;
     max-height: 100% !important;
-    min-height: 480px !important;
+    min-height: 100%;
     overflow: auto;
 }
 
@@ -819,6 +818,12 @@ height: 32px;
 div.tabitem > div:first-child {
 	height:	100%;	
 }
+div#txt2img_styles >:first-child{
+
+    min-height: 42px;
+
+}
+
 div.tabs  > div:first-child {
     overflow-y: clip;
     overflow-x: overlay;

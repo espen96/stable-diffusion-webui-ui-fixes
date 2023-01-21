@@ -369,7 +369,7 @@ def create_toprow(is_img2img):
     id_part = "img2img" if is_img2img else "txt2img"
 
     with gr.Row(elem_id=f"{id_part}_toprow", variant="compact"):
-        with gr.Column(elem_id=f"{id_part}_prompt_container", scale=2):
+        with gr.Column(elem_id=f"{id_part}_prompt_container", scale=3):
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
@@ -414,7 +414,7 @@ def create_toprow(is_img2img):
                 create_refresh_button(prompt_styles, shared.prompt_styles.reload, lambda: {"choices": [
                         k for k, v in shared.prompt_styles.styles.items()]}, f"refresh_{id_part}_styles")
                               
-        with gr.Column(scale=1):
+        with gr.Column(scale=0):
             with gr.Row(elem_id=f"{id_part}_generate_box"):
                 interrupt = gr.Button(
                     'Interrupt', elem_id=f"{id_part}_interrupt")
