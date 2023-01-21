@@ -397,6 +397,7 @@ def create_toprow(is_img2img):
                     value=apply_style_symbol, elem_id="style_apply")
                 clear_prompt_button = gr.Button(
                     value=clear_prompt_symbol, elem_id=f"{id_part}_clear_prompt")
+                extra_networks_button = ToolButton(value=extra_networks_symbol, elem_id=f"{id_part}_extra_networks")
                 token_counter = gr.HTML(
                     value="<span></span>", elem_id=f"{id_part}_token_counter")
                 token_button = gr.Button(
