@@ -818,11 +818,7 @@ height: 32px;
 div.tabitem > div:first-child {
 	height:	100%;	
 }
-div#txt2img_styles >:first-child{
 
-    min-height: 42px;
-
-}
 
 div.tabs  > div:first-child {
     overflow-y: clip;
