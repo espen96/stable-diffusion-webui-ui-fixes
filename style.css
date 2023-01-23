@@ -782,7 +782,7 @@ canvas {
 
 /* Extensions */
 
-#tab_extensions table`` {
+#tab_extensions table{
     border-collapse: collapse;
 }
 
@@ -927,7 +927,15 @@ footer {
     margin-left: -0.8em;
 }
 
-.inactive {
+#img2img_copy_to_img2img, #img2img_copy_to_sketch, #img2img_copy_to_inpaint, #img2img_copy_to_inpaint_sketch{
+    margin-left: 0em;
+}
+
+#axis_options {
+    margin-left: 0em;
+}
+
+.inactive{
     opacity: 0.5;
 }
 
